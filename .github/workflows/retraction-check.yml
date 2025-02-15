@@ -27,7 +27,7 @@ jobs:
           python -m pip install --no-cache-dir bibtexparser==1.4.0
           python -m pip install --no-cache-dir requests==2.31.0
           python -m pip install --no-cache-dir PyGithub==2.1.1
-          python -m pop install --no-cache-dir fuzzywuzzy[speedup]
+          python -m pip install --no-cache-dir fuzzywuzzy[speedup]
           
       - name: Verify installations
         run: |
