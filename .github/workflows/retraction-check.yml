@@ -22,7 +22,7 @@ jobs:
           python-version: "3.9"
 
       - name: Install dependencies
-        run: pip install bibtexparser pandas requests
+        run: pip install bibtexparser pandas requests PyGithub  # Ensure PyGithub is installed
 
       - name: Run Retraction Check
         run: python .github/scripts/check_retractions.py
