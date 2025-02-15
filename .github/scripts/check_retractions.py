@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 import bibtexparser
 import pandas as pd
@@ -12,6 +13,12 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 # Load retraction database
 def load_retraction_db():
+    """
+    Fetch and load the latest Retraction Watch database efficiently.
+    
+    Returns:
+        A set of DOIs for fast lookup and a list of metadata records for fuzzy matching.
+    """
     print("Fetching latest Retraction Watch database...")
     df_iter = pd.read_csv(RETRACTION_DB_URL, low_memory=False, iterator=True, chunksize=50000)
     doi_set = set()
@@ -22,19 +29,27 @@ def load_retraction_db():
             chunk_dois = chunk["OriginalPaperDOI"].dropna().astype(str).str.strip().str.lower()
             doi_set.update(chunk_dois)
 
-        # Store metadata for fuzzy matching
-        if all(col in chunk.columns for col in ["Author", "Year", "Journal", "Title", "Volume", "Issue", "Pages"]):
-            chunk_metadata = chunk[["Author", "Year", "Journal", "Title", "Volume", "Issue", "Pages"]].fillna("").astype(str)
+        if all(col in chunk.columns for col in ["Author", "Title", "Journal", "OriginalPaperDate"]):
+            chunk_metadata = chunk[["Author", "Title", "Journal", "OriginalPaperDate"]].fillna("").astype(str)
             for _, row in chunk_metadata.iterrows():
-                synthetic_string = generate_synthetic_string(row)
-                metadata_records.append((synthetic_string, row["Title"]))
+                normalized_title = normalize_text(row["Title"])
+                normalized_authors = normalize_text(row["Author"])
+                normalized_journal = normalize_text(row["Journal"])
+                normalized_year = extract_year(row["OriginalPaperDate"])
+
+                metadata_records.append((normalized_title, normalized_authors, normalized_journal, normalized_year))
 
     print(f"Loaded {len(doi_set)} retracted DOIs and {len(metadata_records)} metadata records for fuzzy matching.")
     return doi_set, metadata_records
 
-# Generate a synthetic string for fuzzy matching
-def generate_synthetic_string(entry):
-    return f"{entry['Author']} {entry['Year']} {entry['Journal']} {entry['Title']} {entry['Volume']} {entry['Issue']} {entry['Pages']}".strip().lower()
+# Normalize text using regex (remove special characters, lowercase)
+def normalize_text(text):
+    return re.sub(r"[^a-zA-Z0-9\s]", "", text).strip().lower()
+
+# Extract year from date string
+def extract_year(date_str):
+    match = re.search(r"\b(19|20)\d{2}\b", date_str)  # Match years from 1900-2099
+    return match.group(0) if match else ""
 
 # Extract DOIs and metadata from .bib files
 def extract_data_from_bib():
@@ -52,28 +67,27 @@ def extract_data_from_bib():
                             dois.add(doi.strip().lower())
 
                         # Extract metadata for fuzzy matching
-                        author = entry.get("author", "")
-                        year = entry.get("year", "")
-                        journal = entry.get("journal", "")
-                        title = entry.get("title", "")
-                        volume = entry.get("volume", "")
-                        issue = entry.get("issue", "")
-                        pages = entry.get("pages", "")
-                        synthetic_string = generate_synthetic_string({
-                            "Author": author, "Year": year, "Journal": journal,
-                            "Title": title, "Volume": volume, "Issue": issue, "Pages": pages
-                        })
-                        metadata_entries.append((synthetic_string, title))
+                        title = normalize_text(entry.get("title", ""))
+                        authors = normalize_text(entry.get("author", ""))
+                        journal = normalize_text(entry.get("journal", ""))
+                        year = extract_year(entry.get("year", ""))
+
+                        metadata_entries.append((title, authors, journal, year))
     return dois, metadata_entries
 
-# Perform fuzzy matching
-def fuzzy_match(metadata_entries, retraction_metadata, threshold=90):
+# Perform fuzzy matching across title, authors, journal, and year
+def fuzzy_match(metadata_entries, retraction_metadata, threshold=85):
     matched_titles = []
-    for bib_string, bib_title in metadata_entries:
-        for ret_string, ret_title in retraction_metadata:
-            similarity = fuzz.partial_ratio(bib_string, ret_string)
-            if similarity >= threshold:
-                print(f"⚠️ Possible retraction match: {bib_title} ~ {ret_title} (Score: {similarity})")
+    for bib_title, bib_authors, bib_journal, bib_year in metadata_entries:
+        for ret_title, ret_authors, ret_journal, ret_year in retraction_metadata:
+            title_score = fuzz.partial_ratio(bib_title, ret_title)
+            author_score = fuzz.partial_ratio(bib_authors, ret_authors)
+            journal_score = fuzz.partial_ratio(bib_journal, ret_journal)
+            year_match = (bib_year == ret_year)  # Exact year match
+
+            # Strong match if title + (author OR journal) + year
+            if title_score >= threshold and (author_score >= threshold or journal_score >= threshold) and year_match:
+                print(f"⚠️ Strong retraction match: {bib_title} ~ {ret_title} (Title: {title_score}, Author: {author_score}, Journal: {journal_score})")
                 matched_titles.append(bib_title)
     return matched_titles
 
@@ -95,7 +109,6 @@ def create_github_issue(retracted_dois, fuzzy_matches):
         issue_body += "\n\n**Fuzzy Matches (Possible Retractions):**\n"
         issue_body += "\n".join([f"- {title}" for title in fuzzy_matches])
 
-    # Check if an issue already exists
     existing_issues = repo.get_issues(state="open")
     for issue in existing_issues:
         if issue.title == issue_title:
