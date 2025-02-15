@@ -1,0 +1,17 @@
+name: "Retracted Articles Checker"
+description: "Scans .bib files for retracted articles and opens a GitHub issue if any are found."
+author: "Gaurav Sood"
+branding:
+  icon: "alert-triangle"
+  color: "red"
+
+inputs:
+  github_token:
+    description: "GitHub token for authentication"
+    required: true
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    GITHUB_TOKEN: ${{ inputs.github_token }}
