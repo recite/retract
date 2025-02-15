@@ -1,5 +1,4 @@
 name: Check Retracted Articles in .bib Files
-
 on:
   push:
     paths:
@@ -8,35 +7,37 @@ on:
     paths:
       - '**/*.bib'
   workflow_dispatch:
-
 jobs:
   check-retractions:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
-
+          python-version: "3.11"
+          
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          echo "bibtexparser==1.4.0" > requirements.txt
-          echo "pandas==2.0.3" >> requirements.txt
-          echo "requests==2.31.0" >> requirements.txt
-          echo "PyGithub==1.59.1" >> requirements.txt
-          pip install -r requirements.txt
-          pip list
-          python -c "import sys; print(sys.path)"
+          python -m pip install --upgrade pip wheel setuptools
+          python -m pip install --no-cache-dir numpy==1.26.3
+          python -m pip install --no-cache-dir pandas==2.1.4
+          python -m pip install --no-cache-dir bibtexparser==1.4.0
+          python -m pip install --no-cache-dir requests==2.31.0
+          python -m pip install --no-cache-dir PyGithub==2.1.1
           
-      - name: Check Installed Packages
-        run: pip list  # Debugging step to confirm installation
-
+      - name: Verify installations
+        run: |
+          echo "Checking installed packages:"
+          pip list
+          echo "Verifying imports:"
+          python -c "import numpy; import pandas; import bibtexparser; import requests; from github import Github; print('All required packages imported successfully!')"
+          
       - name: Run Retraction Check
-        run: python .github/scripts/check_retractions.py
+        run: |
+          echo "Starting retraction check..."
+          python .github/scripts/check_retractions.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
