@@ -1,0 +1,30 @@
+name: Check Retracted Articles in .bib Files
+
+on:
+  push:
+    paths:
+      - '**/*.bib'
+  pull_request:
+    paths:
+      - '**/*.bib'
+
+jobs:
+  check-retractions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: pip install bibtexparser pandas requests
+
+      - name: Run Retraction Check
+        run: python .github/scripts/check_retractions.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
