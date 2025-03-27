@@ -6,6 +6,9 @@ on:
   pull_request:
     paths:
       - '**/*.bib'
+  # Run every 90 days to check against updated retraction database
+  schedule:
+    - cron: '0 0 1 */3 *'  # Run at midnight on the 1st day every 3rd month
   workflow_dispatch:
 jobs:
   check-retractions:
