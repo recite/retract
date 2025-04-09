@@ -2,16 +2,23 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install wheel first
-RUN pip install --no-cache-dir wheel
+# Add build dependencies for compiling packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy and install dependencies
+# Install pip wheel explicitly (fix for bdist_wheel missing)
+RUN pip install --upgrade pip wheel setuptools
+
+# Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all repo files
+# Copy your source code
 COPY . .
 
-# Run the script
+# Set entrypoint
 ENTRYPOINT ["python", "check_retractions.py"]
+
 
