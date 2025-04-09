@@ -2,23 +2,24 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Add build dependencies for compiling packages
+# Install system dependencies required for building Python packages
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pip wheel explicitly (fix for bdist_wheel missing)
-RUN pip install --upgrade pip wheel setuptools
+# Upgrade pip, setuptools, and wheel
+RUN pip install --upgrade pip setuptools wheel
 
-# Copy requirements and install dependencies
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy your source code
-COPY . .
+# Copy your actual script
+COPY check_retractions.py .
 
-# Set entrypoint
+# Set default command
 ENTRYPOINT ["python", "check_retractions.py"]
+
 
 
