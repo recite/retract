@@ -24,6 +24,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the script only after dependencies are installed (faster rebuilds)
 COPY check_retractions.py .
 
+RUN echo "Script contents:" && cat check_retractions.py && ls -la
+
 # Set default execution
 ENTRYPOINT ["python", "check_retractions.py"]
 
