@@ -1,33 +1,22 @@
 FROM python:3.11-slim
 
-# Set working directory early to leverage Docker caching
-WORKDIR /app
+# Set GitHub Actions working directory
+WORKDIR /github/workspace
 
-# Install system packages only if needed
+# Install build tools and Python basics
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
-    && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip, setuptools, wheel (wheel is critical for fast builds)
 RUN pip install --upgrade pip setuptools wheel
 
-# Copy and install dependencies separately to leverage layer caching
+# Preinstall bibtexparser to avoid wheel errors
 COPY requirements.txt .
-
-# Pre-install problematic packages first to cache their wheels
 RUN pip install --no-cache-dir bibtexparser==1.4.0
-
-# Install the rest (this way, only the fast-to-install packages rerun on changes)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the script only after dependencies are installed (faster rebuilds)
+# Copy the script here (where GitHub will run the container)
 COPY check_retractions.py .
 
-RUN echo "Script contents:" && cat check_retractions.py && ls -la
-
-# Set default execution
 ENTRYPOINT ["python", "check_retractions.py"]
-
-
-
