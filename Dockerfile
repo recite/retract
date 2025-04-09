@@ -1,22 +1,25 @@
 FROM python:3.11-slim
 
-# Set GitHub Actions working directory
+# Explicitly set working directory
 WORKDIR /github/workspace
 
-# Install build tools and Python basics
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install necessary tools
+RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
+# Upgrade pip
 RUN pip install --upgrade pip setuptools wheel
 
-# Preinstall bibtexparser to avoid wheel errors
-COPY requirements.txt .
-RUN pip install --no-cache-dir bibtexparser==1.4.0
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy everything from current directory
+COPY . .
 
-# Copy the script here (where GitHub will run the container)
-COPY check_retractions.py .
+# Install dependencies
+RUN pip install -r requirements.txt
 
+# Ensure script is executable
+RUN chmod +x check_retractions.py
+
+# Run the script
 ENTRYPOINT ["python", "check_retractions.py"]
