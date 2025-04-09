@@ -42,6 +42,6 @@ jobs:
       - name: Run Retraction Check
         run: |
           echo "Starting retraction check..."
-          python .github/scripts/check_retractions.py
+          python check_retractions.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
