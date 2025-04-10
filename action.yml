@@ -1,5 +1,5 @@
-name: "Retraction Check"
-description: "Scans .bib files for retracted DOIs using the Retraction Watch database and opens issues if any are found."
+name: "Retracted Articles Checker"
+description: "Scans .bib files for retracted articles and opens a GitHub issue if any are found."
 author: "Gaurav Sood"
 branding:
   icon: "alert-triangle"
@@ -13,7 +13,6 @@ inputs:
 runs:
   using: "docker"
   image: "Dockerfile"
-  args:
-    - check_retractions.py
   env:
     GITHUB_TOKEN: ${{ inputs.github_token }}
+
