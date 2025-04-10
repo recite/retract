@@ -18,5 +18,7 @@ COPY . .
 # Ensure main script is executable
 RUN chmod +x check_retractions.py
 
-ENTRYPOINT ["python", "check_retractions.py"]
+ENTRYPOINT ["python"]
+CMD ["check_retractions.py"]
+
 
