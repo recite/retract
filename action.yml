@@ -1,26 +1,17 @@
-name: Retraction Check
-on: [push, pull_request]
-jobs:
-  check-retractions:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Debug Workspace
-      run: |
-        echo "Current directory:"
-        pwd
-        echo "Repository contents:"
-        ls -la
-        echo "GitHub workspace:"
-        echo $GITHUB_WORKSPACE
-        echo "Checking script permissions:"
-        ls -l check_retractions.py
-        echo "First few lines of script:"
-        head -n 5 check_retractions.py
-    
-    - name: Run Retraction Check
-      uses: ./  # Use the local action
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+name: "Retraction Check"
+description: "Scans .bib files for retracted DOIs using the Retraction Watch database and opens issues if any are found."
+author: "Gaurav Sood"
+branding:
+  icon: "alert-triangle"
+  color: "red"
+
+inputs:
+  github_token:
+    description: "GitHub token for authentication"
+    required: true
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    GITHUB_TOKEN: ${{ inputs.github_token }}
