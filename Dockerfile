@@ -18,10 +18,10 @@ RUN pip install --no-cache-dir bibtexparser==1.4.0
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the script into /app (this directory is inside the image)
-COPY check_retractions.py /app/check_retractions.py
+COPY check_retractions.py .
 
 # (Optional) Debug step to list the contents of /app
-RUN ls -la /app
+RUN ls -la .
 
 # Use the baked-in script
-ENTRYPOINT ["python", "/app/check_retractions.py"]
+ENTRYPOINT ["python", "check_retractions.py"]
