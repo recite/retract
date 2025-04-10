@@ -11,3 +11,25 @@ The action uses data from [RetractionWatch](https://gitlab.com/crossref/retracti
 Here's a [sample issue](https://github.com/recite/retract/issues/1) opened by the action for this [sample.bib](https://github.com/recite/retract/blob/main/sample.bib) file.
 
 Here's a [repository](https://github.com/soodoku/adult/) that uses this action. (Just copy the action and you are gtg.)
+
+(Make sure you have the latest version.
+
+```yaml
+name: Retracted Articles Check
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  check-retracted-articles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Retraction Checker
+        uses: recite/retract@v1.91
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+```
