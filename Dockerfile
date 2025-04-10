@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
-# Set a working directory that won't be overridden
-WORKDIR /app
+# Use a directory not affected by the GitHub mount (which goes to /github/workspace)
+WORKDIR /action
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -12,16 +12,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Upgrade pip, setuptools, and wheel
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Copy dependencies and install them
+# Copy requirements and install them
 COPY requirements.txt .
 RUN pip install --no-cache-dir bibtexparser==1.4.0
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the script into /app (this directory is inside the image)
+# Copy your action code (check_retractions.py) into /action
 COPY check_retractions.py .
 
-# (Optional) Debug step to list the contents of /app
-RUN ls -la .
+# (Optional) Debug step: list the contents of /action
+RUN ls -la /action
 
-# Use the baked-in script
-ENTRYPOINT ["python", "check_retractions.py"]
+# Set an environment variable that tells your script where the consuming repo is mounted
+# GitHub Actions mounts the consumer repo at /github/workspace
+ENV SCAN_ROOT=/github/workspace
+
+# Use an absolute path for the entrypoint so that it runs the baked-in script from /action
+ENTRYPOINT ["python", "/action/check_retractions.py"]
+
