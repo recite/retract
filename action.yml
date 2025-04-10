@@ -13,5 +13,7 @@ inputs:
 runs:
   using: "docker"
   image: "Dockerfile"
+  args:
+    - check_retractions.py
   env:
     GITHUB_TOKEN: ${{ inputs.github_token }}
