@@ -15,11 +15,17 @@ RUN pip install --upgrade pip setuptools wheel
 # Copy everything from current directory
 COPY . .
 
+# Debug: List contents of the directory
+RUN ls -la
+
 # Install dependencies
 RUN pip install -r requirements.txt
 
 # Ensure script is executable
 RUN chmod +x check_retractions.py
+
+# Debug: Show script contents
+RUN head -n 5 check_retractions.py
 
 # Run the script
 ENTRYPOINT ["python", "check_retractions.py"]
