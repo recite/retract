@@ -16,10 +16,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the actual retraction check logic
 COPY check_retractions.py /app/
-ENTRYPOINT ["python", "/app/check_retractions.py"]
-
-# Run it
+WORKDIR /app
 ENTRYPOINT ["python", "check_retractions.py"]
-
-
-
