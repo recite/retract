@@ -3,6 +3,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/recite/retract)
 ![GitHub Marketplace](https://img.shields.io/badge/GitHub%20Marketplace-retract)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![Used By](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/gojiplus/adjacent/main/docs/retract.json)](https://github.com/search?q=recite/retract+path%3A.github%2Fworkflows+language%3AYAML&type=code)
 
 Github Action that opens an issue when a retracted article is discovered in a .bib file in the repository. (You can run it on a regular cadence. The default is to check if .bib is updated or every three months.)
 
