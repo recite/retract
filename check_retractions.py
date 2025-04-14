@@ -1,7 +1,9 @@
+import json
 import os
 import re
 import requests
 import bibtexparser
+from pathlib import Path
 import pandas as pd
 from fuzzywuzzy import fuzz
 from github import Github
@@ -91,6 +93,29 @@ def fuzzy_match(metadata_entries, retraction_metadata, threshold=85):
                 matched_titles.append(bib_title)
     return matched_titles
 
+def write_badge(retracted_dois_found, fuzzy_matches_found):
+    badge_dir = Path(".github/badges")
+    badge_dir.mkdir(parents=True, exist_ok=True)
+    badge_path = badge_dir / "retraction_status.json"
+
+    if retracted_dois_found or fuzzy_matches_found:
+        badge_data = {
+            "schemaVersion": 1,
+            "label": "retractions",
+            "message": "⚠️ cited",
+            "color": "red"
+        }
+    else:
+        badge_data = {
+            "schemaVersion": 1,
+            "label": "retractions",
+            "message": "none cited",
+            "color": "brightgreen"
+        }
+
+    with open(badge_path, "w") as f:
+        json.dump(badge_data, f, indent=2)
+
 # Open GitHub Issue for detected retractions
 def create_github_issue(retracted_dois, fuzzy_matches):
     if not GITHUB_TOKEN:
@@ -133,7 +158,9 @@ def main():
         create_github_issue(retracted_dois_found, fuzzy_matches_found)
     else:
         print("No retracted articles found.")
-
+        
+    write_badge(retracted_dois_found, fuzzy_matches_found)
+    
 if __name__ == "__main__":
     main()
 
