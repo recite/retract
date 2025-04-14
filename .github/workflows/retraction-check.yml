@@ -45,3 +45,16 @@ jobs:
           python check_retractions.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Copy badge to repo
+        run: |
+          mkdir -p .github/badges
+          cp badge.json .github/badges/retraction_status.json
+      
+      - name: Commit badge
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .github/badges/retraction_status.json
+          git commit -m "Update retraction badge"
+          git push
+
