@@ -1,6 +1,7 @@
 name: Check Retracted Articles in .bib Files
 on:
   push:
+    branches: [main]
     paths:
       - '**/*.bib'
   pull_request:
