@@ -47,6 +47,9 @@ def read_csl(path: Path, source: str):
         try:
             if not isinstance(entry, dict):
                 raise ValueError("citation must be an object")
+            for field in ("title", "container-title", "DOI", "URL"):
+                if field in entry and not isinstance(entry[field], str):
+                    raise ValueError(f"{field} must be a string")
             authors = "; ".join(
                 a.get("literal")
                 or ", ".join(filter(None, [a.get("family"), a.get("given")]))

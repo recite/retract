@@ -109,6 +109,33 @@ def test_explicit_root_and_excludes(tmp_path):
         read_citations(tmp_path, ["../*.bib"], [])
 
 
+@pytest.mark.parametrize("field", ["title", "container-title", "DOI", "URL"])
+@pytest.mark.parametrize("value", [None, ["unexpected"]])
+def test_malformed_csl_preserves_valid_neighbors(tmp_path, field, value):
+    path = tmp_path / "refs.csl.json"
+    path.write_text(json.dumps([{field: value}, {"id": "valid", "DOI": "10.1234/abc"}]))
+    report_path = tmp_path / "report.json"
+    assert (
+        main(
+            [
+                "--scan-root",
+                str(tmp_path),
+                "--database",
+                str(FIXTURES / "notices.csv"),
+                "--report",
+                str(report_path),
+            ]
+        )
+        == 2
+    )
+    report = json.loads(report_path.read_text())
+    assert report["status"] == "incomplete"
+    assert report["coverage"]["citations"] == 1
+    assert report["errors"] == [
+        f"refs.csl.json:1: invalid CSL entry: {field} must be a string"
+    ]
+
+
 def test_database_schema_fails_closed(tmp_path):
     path = tmp_path / "bad.csv"
     path.write_text("Unexpected\n1\n")
@@ -145,6 +172,38 @@ def test_metadata_and_doi_conflicts(notices):
     citation = replace(notices[0].citation, doi="")
     assert index.match(citation, POLICY)[0].status == "possible"
     assert not index.match(replace(citation, doi="10.1234/another"), POLICY)
+
+
+@pytest.mark.parametrize("date", ["", "   "])
+def test_blank_reinstatement_dates_preserve_findings(notices, date):
+    retraction = notices[0]
+    reinstatement = replace(
+        retraction, record_id="3", nature="Reinstatement", date=date
+    )
+    findings = Matcher([retraction, reinstatement]).match(retraction.citation, POLICY)
+    assert [f.status for f in findings] == ["status_uncertain", "other_notice"]
+    assert (
+        notice_status(replace(retraction, date=date), [reinstatement])
+        == "status_uncertain"
+    )
+
+
+def test_metadata_match_preserves_same_doi_notice_history(notices):
+    retraction = notices[0]
+    reinstatement = replace(
+        retraction,
+        record_id="3",
+        nature="Reinstatement",
+        date="1/2/2024",
+        citation=replace(
+            retraction.citation, title="A differently titled reinstatement"
+        ),
+    )
+    findings = Matcher([retraction, reinstatement]).match(
+        replace(retraction.citation, doi=""), POLICY
+    )
+    assert [f.notice.nature for f in findings] == ["Retraction", "Reinstatement"]
+    assert all(f.status == "possible" for f in findings)
 
 
 @pytest.mark.parametrize(

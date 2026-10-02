@@ -59,7 +59,7 @@ Outputs are `status` and `confirmed-count`. The latter counts citation/notice pa
 
 Incomplete and empty scans exit with code 2. They produce reports but do not change GitHub issues. A missing notification permission also exits with code 2 and records `notification_error` in JSON. `fail-on-retraction` produces exit code 1 only for a confirmed active retraction; possible metadata matches never cause that exit code.
 
-Reports contain source paths and citation keys, coverage counts, uncheckable entries, parser errors, notice types and dates, matching methods and scores, and the database SHA-256. If both a retraction and a later reinstatement have the same DOI, the older retraction is marked reinstated. Ambiguous reinstatement dates are marked uncertain. Metadata matches remain possible matches regardless of notice type.
+Reports contain source paths and citation keys, coverage counts, uncheckable entries, parser errors, notice types and dates, matching methods and scores, and the database SHA-256. Once a match identifies a database DOI, the report includes all notices for that DOI, including notices with different titles. If both a retraction and a later reinstatement have the same DOI, the older retraction is marked reinstated. Ambiguous reinstatement dates are marked uncertain. Metadata matches remain possible matches regardless of notice type.
 
 ## Matching
 

@@ -113,6 +113,11 @@ class Matcher:
         selected = select_candidate(candidates, policy)
         if selected is None:
             return []
+        matches = (
+            self.by_doi[selected["notice"].citation.doi]
+            if selected["notice"].citation.doi
+            else selected["notices"]
+        )
         return [
             Finding(
                 citation,
@@ -121,7 +126,7 @@ class Matcher:
                 round(selected[policy["method"]], 6),
                 "possible",
             )
-            for n in selected["notices"]
+            for n in matches
         ]
 
 
@@ -160,6 +165,6 @@ def notice_status(notice, related):
         dates = [
             datetime.strptime(n.date.split()[0], "%m/%d/%Y") for n in reinstatements
         ]
-    except ValueError:
+    except (ValueError, IndexError):
         return "status_uncertain"
     return "reinstated" if max(dates) >= retraction_date else "confirmed_retraction"
