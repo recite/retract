@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "retract-check"
+version = "3.0.0"
+description = "Check bibliographies against Retraction Watch with traceable match evidence."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{name = "Gaurav Sood"}]
+keywords = ["retractions", "bibliography", "bibtex", "research", "github-actions"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Text Processing :: Markup :: LaTeX",
+]
+dependencies = [
+  "bibtexparser==2.0.1",
+  "pylatexenc==2.11",
+  "rapidfuzz==3.14.6",
+  "requests==2.34.2",
+  "scikit-learn==1.9.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/recite/retract"
+Repository = "https://github.com/recite/retract"
+Issues = "https://github.com/recite/retract/issues"
+
+[project.scripts]
+retract-check = "retract.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1", "black==26.5.1", "isort==9.0.2", "flake8==7.4.1", "build==1.6.1", "twine==7.0.0"]
+
+[tool.setuptools.packages.find]
+include = ["retract*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.setuptools.package-data]
+retract = ["policy.json"]

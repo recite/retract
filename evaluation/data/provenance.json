@@ -1,0 +1,11 @@
+{
+  "url": "https://gitlab.com/crossref/retraction-watch-data/-/raw/main/retraction_watch.csv",
+  "sha256": "897e8aa6580f0c2c6c1aa1c206ccc69df72961f6ac0255d5f7e17955bd4b706c",
+  "records": 72831,
+  "queries": 2967,
+  "label": "normalized DOI equality",
+  "crossref": "https://api.crossref.org/works",
+  "split": "sha256(DOI), 40% train / 30% validation / 30% test",
+  "sampling": "2000 seeded DOI selections from Retraction Watch; 1000 Crossref random journal articles",
+  "seed": 20261001
+}

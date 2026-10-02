@@ -1,0 +1,3 @@
+Record ID,Title,Author,Journal,OriginalPaperDate,OriginalPaperDOI,RetractionNature,RetractionDate,RetractionDOI,URLS
+1,The determinants of political knowledge in adulthood,Jane Smith,Journal of Example Research,1/1/2020,10.1234/example,Retraction,1/1/2024,10.1234/notice,https://example.org/notice
+2,A separate article about national income,Robin Jones,Journal of Example Research,1/1/2020,10.1234/correction,Correction,1/1/2024,10.1234/correction-notice,

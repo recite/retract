@@ -1,18 +1,49 @@
-name: "Retracted Articles Checker"
-description: "Scans .bib files for retracted articles and opens a GitHub issue if any are found."
-author: "Gaurav Sood"
+name: Bibliography Notice Checker
+description: Check BibTeX and CSL-JSON citations against Retraction Watch, with match evidence and coverage reporting.
+author: Gaurav Sood
 branding:
-  icon: "alert-triangle"
-  color: "red"
-
+  icon: alert-triangle
+  color: orange
 inputs:
-  github_token:
-    description: "GitHub token for authentication"
-    required: true
-
+  github-token:
+    description: Token with issues write permission when issue synchronization is enabled.
+    default: ${{ github.token }}
+  paths:
+    description: Newline-separated bibliography globs relative to the checkout.
+    default: |
+      **/*.bib
+      **/*.bibtex
+      **/*.csl.json
+  exclude:
+    description: Newline-separated exclusion patterns relative to the checkout.
+    default: ''
+  create-issue:
+    description: Synchronize one issue after a complete scan; false produces reports only.
+    default: 'true'
+  fail-on-retraction:
+    description: Fail when an exact DOI match identifies an active retraction.
+    default: 'false'
+  report-path:
+    description: Path for the JSON report, relative to the checkout.
+    default: retraction-report.json
+outputs:
+  status:
+    description: findings, no_matches, incomplete, or no_input.
+  confirmed-count:
+    description: Number of citation and notice pairs identifying active retractions by DOI.
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: docker
+  image: Dockerfile
   env:
-    GITHUB_TOKEN: ${{ inputs.github_token }}
-
+    GITHUB_TOKEN: ${{ inputs.github-token }}
+  args:
+    - --paths
+    - ${{ inputs.paths }}
+    - --exclude
+    - ${{ inputs.exclude }}
+    - --create-issue
+    - ${{ inputs.create-issue }}
+    - --fail-on-retraction
+    - ${{ inputs.fail-on-retraction }}
+    - --report
+    - ${{ inputs.report-path }}
