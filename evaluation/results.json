@@ -1,0 +1,101 @@
+{
+  "selected": "ratio",
+  "development": {
+    "exact": {
+      "policy": {
+        "method": "exact",
+        "threshold": 1.0,
+        "margin": 0.1,
+        "year_gap": 0,
+        "author": 0.5,
+        "journal": 0.9
+      },
+      "train": {
+        "queries": 1151,
+        "tp": 550,
+        "fp": 0,
+        "fn": 208,
+        "tn": 393,
+        "precision": 1.0,
+        "recall": 0.7255936675461742
+      },
+      "validation": {
+        "queries": 899,
+        "tp": 452,
+        "fp": 0,
+        "fn": 144,
+        "tn": 303,
+        "precision": 1.0,
+        "recall": 0.7583892617449665
+      }
+    },
+    "ratio": {
+      "policy": {
+        "method": "ratio",
+        "threshold": 0.85,
+        "margin": 0.1,
+        "year_gap": 1,
+        "author": 0.5,
+        "journal": 0.9
+      },
+      "train": {
+        "queries": 1151,
+        "tp": 716,
+        "fp": 0,
+        "fn": 42,
+        "tn": 393,
+        "precision": 1.0,
+        "recall": 0.9445910290237467
+      },
+      "validation": {
+        "queries": 899,
+        "tp": 565,
+        "fp": 0,
+        "fn": 31,
+        "tn": 303,
+        "precision": 1.0,
+        "recall": 0.947986577181208
+      }
+    },
+    "cosine": {
+      "policy": {
+        "method": "cosine",
+        "threshold": 0.85,
+        "margin": 0.05,
+        "year_gap": 1,
+        "author": 0.5,
+        "journal": 0.9
+      },
+      "train": {
+        "queries": 1151,
+        "tp": 706,
+        "fp": 0,
+        "fn": 52,
+        "tn": 393,
+        "precision": 1.0,
+        "recall": 0.9313984168865436
+      },
+      "validation": {
+        "queries": 899,
+        "tp": 564,
+        "fp": 0,
+        "fn": 32,
+        "tn": 303,
+        "precision": 1.0,
+        "recall": 0.9463087248322147
+      }
+    }
+  },
+  "test": {
+    "queries": 917,
+    "tp": 576,
+    "fp": 0,
+    "fn": 38,
+    "tn": 303,
+    "precision": 1.0,
+    "recall": 0.9381107491856677
+  },
+  "retrieval_recall_at_10": 0.9928861788617886,
+  "seconds": 89.29193516704254,
+  "query_sha256": "2ac48b653b3580599e33b58913a0852589941a4eecbd415996fbc3cb0f20efcb"
+}

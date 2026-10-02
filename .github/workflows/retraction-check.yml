@@ -1,57 +1,28 @@
-name: Check Retracted Articles in .bib Files
+name: Check bibliography notices
 on:
-  push:
-    branches: [main]
-    paths:
-      - '**/*.bib'
-  pull_request:
-    paths:
-      - '**/*.bib'
-  # Run every 90 days to check against updated retraction database
   schedule:
-    - cron: '0 0 1 */3 *'  # Run at midnight on the 1st day every 3rd month
+    - cron: '43 6 8 1,4,7,10 *'
   workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: retraction-check
+  cancel-in-progress: false
 jobs:
-  check-retractions:
+  check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v7.0.1
         with:
-          python-version: "3.11"
-          
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip wheel setuptools
-          python -m pip install --no-cache-dir numpy==1.26.3
-          python -m pip install --no-cache-dir pandas==2.1.4
-          python -m pip install --no-cache-dir bibtexparser==1.4.0
-          python -m pip install --no-cache-dir requests==2.31.0
-          python -m pip install --no-cache-dir PyGithub==2.1.1
-          python -m pip install --no-cache-dir fuzzywuzzy[speedup]
-          
-      - name: Verify installations
-        run: |
-          echo "Checking installed packages:"
-          pip list
-          echo "Verifying imports:"
-          python -c "import numpy; import pandas; import bibtexparser; import requests; from github import Github; print('All required packages imported successfully!')"
-          
-      - name: Run Retraction Check
-        run: |
-          echo "Starting retraction check..."
-          python check_retractions.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-      - name: Commit badge
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add .github/badges/retraction_status.json
-          git commit -m "Update retraction badge"
-          git push
-
+          persist-credentials: false
+      - uses: ./
+        with:
+          paths: sample.bib
+          create-issue: 'false'
+      - uses: actions/upload-artifact@v7.0.1
+        if: always()
+        with:
+          name: retraction-report
+          path: retraction-report.json

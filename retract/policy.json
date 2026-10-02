@@ -1,0 +1,8 @@
+{
+  "method": "ratio",
+  "threshold": 0.85,
+  "margin": 0.1,
+  "year_gap": 1,
+  "author": 0.5,
+  "journal": 0.9
+}

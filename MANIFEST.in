@@ -1,0 +1,4 @@
+include Makefile Dockerfile action.yml .flake8
+include CHANGELOG.md
+recursive-include tests *.py *.bib *.csv
+recursive-include evaluation *.py *.md *.json *.gz
