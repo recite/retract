@@ -1,4 +1,4 @@
-# retract
+# retract: check your bibliography for retractions and corrections
 
 [![Tests](https://github.com/recite/retract/actions/workflows/check.yml/badge.svg)](https://github.com/recite/retract/actions/workflows/check.yml)
 [![Release](https://img.shields.io/github/v/release/recite/retract)](https://github.com/recite/retract/releases)
